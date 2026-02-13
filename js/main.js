@@ -632,16 +632,32 @@ function initScrollInteraction(threeApp) {
     // --- LOGISTICS CANVAS ANIMATION ---
     const logisticsCanvas = document.getElementById('canvas-logistics');
     const logisticsFrames = [];
-    const logisticsFrameCount = 26; // ezgif-frame-001 to 026
     const logisticsImagesCtx = { currentFrame: 0 };
 
+    // Explicitly sorted array of frames from 'images/logistics scroll'
+    // Sorted by time: 00s -> 01s -> 02s -> 03s -> 04s -> 05s
+    const logisticsImageFiles = [
+        "frame_0_00_1f.jpeg", "frame_0_00_3f.jpeg", "frame_0_00_5f.jpeg", "frame_0_00_7f.jpeg",
+        "frame_0_00_9f.jpeg", "frame_0_00_14f.jpeg", "frame_0_00_16f.jpeg", "frame_0_00_20f.jpeg",
+        "frame_0_01_0f.jpeg", "frame_0_01_2f.jpeg", "frame_0_01_4f.jpeg", "frame_0_01_10f.jpeg",
+        "frame_0_01_16f.jpeg", "frame_0_01_21f.jpeg",
+        "frame_0_02_1f.jpeg", "frame_0_02_6f.jpeg", "frame_0_02_10f.jpeg", "frame_0_02_14f.jpeg",
+        "frame_0_02_18f.jpeg", "frame_0_02_22f.jpeg",
+        "frame_0_03_1f.jpeg", "frame_0_03_5f.jpeg", "frame_0_03_10f.jpeg", "frame_0_03_14f.jpeg",
+        "frame_0_03_19f.jpeg", "frame_0_03_23f.jpeg",
+        "frame_0_04_2f.jpeg", "frame_0_04_5f.jpeg", "frame_0_04_8f.jpeg", "frame_0_04_11f.jpeg",
+        "frame_0_04_14f.jpeg", "frame_0_04_17f.jpeg", "frame_0_04_21f.jpeg",
+        "frame_0_05_0f.jpeg", "frame_0_05_1f.jpeg"
+    ];
+
+    const logisticsFrameCount = logisticsImageFiles.length;
+
     // Preload Logistics Images
-    for (let i = 1; i <= logisticsFrameCount; i++) {
+    logisticsImageFiles.forEach(filename => {
         const img = new Image();
-        const num = i.toString().padStart(3, '0');
-        img.src = `images/ezgif-1cabe3ad26f14bde-jpg/ezgif-frame-${num}.jpg`;
+        img.src = `images/logistics scroll/${filename}`;
         logisticsFrames.push(img);
-    }
+    });
 
     function renderLogisticsFrame() {
         if (!logisticsCanvas) return;
@@ -941,7 +957,7 @@ function initScrollInteraction(threeApp) {
             // Background Focus & Image Swap
             ScrollTrigger.create({
                 trigger: section,
-                start: "top center",
+                start: "top 90%", // EARLIER SWAP: Before fog clears (at top 80%)
                 end: "bottom center",
                 onEnter: () => {
                     threeApp.highlightSection(index + 1);
@@ -1029,10 +1045,23 @@ function initScrollInteraction(threeApp) {
             // Let's trigger it on entering section i+1
             const nextSection = companySections[i + 1];
             if (nextSection) {
+                // Fade out CURRENT section's content as next section enters
+                // Ensures it's gone before the BG swap at "top 90%"
+                gsap.to(section.querySelector('.content'), {
+                    scrollTrigger: {
+                        trigger: nextSection,
+                        start: "top bottom",
+                        end: "top 90%",
+                        scrub: 1
+                    },
+                    opacity: 0,
+                    y: -30 // Move up slightly
+                });
+
                 ScrollTrigger.create({
                     trigger: nextSection,
                     start: "top bottom", // Starts when next section enters viewport
-                    end: "top 80%",   // Ends very soon (immediate transition)
+                    end: "top 60%",   // Ends later (longer duration)
                     scrub: 1, // Smooth scrub
                     onUpdate: (self) => {
                         // We want:

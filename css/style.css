@@ -304,10 +304,10 @@ body {
     /* Ensure content is reachable */
     padding: 10vh 0;
     /* Spacing within section */
-    margin-bottom: 10vh;
+    margin-bottom: 15vh;
     /* Added spacing between companies */
-    min-height: 100vh;
-    /* Reduced height for faster scroll (was 250vh) */
+    min-height: 130vh;
+    /* Increased height for longer scroll (was 100vh) */
     display: flex;
     align-items: center;
 }
